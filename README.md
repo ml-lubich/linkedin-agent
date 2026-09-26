@@ -16,6 +16,9 @@ send/attach, post publish) on top.
 # the CLI + library
 uv tool install git+https://github.com/ml-lubich/linkedin-agent
 
+# the `li`/`own-chrome` CLIs it shells out to (not pulled onto PATH by the install above)
+uv tool install git+https://github.com/ml-lubich/own-chrome
+
 # for coding agents: the SKILL.md that documents the workflows above
 npx skills add ml-lubich/linkedin-agent
 ```
