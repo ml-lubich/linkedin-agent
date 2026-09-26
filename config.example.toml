@@ -1,0 +1,70 @@
+# linkedin-agent config.
+#
+# Copy this file to ~/.config/linkedin-agent/config.toml and fill in your own
+# values. Everything here can also be set via environment variables (see the
+# comment above each key) — env vars win when both are set. Nothing in this
+# file is read from the internet or sent anywhere except your own Chrome.
+
+[chrome]
+# LINKEDIN_AGENT_CDP_PORT
+port = 9222
+
+[user]
+# Your own name, as it appears in LinkedIn's message UI ("View <name>'s profile").
+# Used to tell your own messages apart from the other side's in a thread.
+# LINKEDIN_AGENT_SELF_NAME
+self_name = "Your Name"
+
+[referral]
+# Who you refer inbound recruiter messages to, when you use `send-referral`.
+# Leave this whole section out (or referral.enabled = false) if you don't
+# want the referral feature at all — everything else in the package works
+# without it.
+enabled = false
+# LINKEDIN_AGENT_REFEREE_NAME
+name = "Referee Name"
+# LINKEDIN_AGENT_REFEREE_EMAIL
+email = "referee@example.com"
+# LINKEDIN_AGENT_REFEREE_LINKEDIN
+linkedin_url = "https://www.linkedin.com/in/referee-example/"
+# Absolute path to the PDF resume to attach. Keep the real file out of git.
+# LINKEDIN_AGENT_REFEREE_RESUME
+resume_path = "/absolute/path/to/referee_resume.pdf"
+# Filename LinkedIn should show for the attachment (no internal variant suffixes).
+attachment_name = "resume.pdf"
+# One-line facts about the referee, matched by keyword against the recruiter's
+# message/headline (case-insensitive substrings). First match wins; "default"
+# is used when nothing else matches. Keep these truthful and specific.
+[[referral.pitch]]
+keywords = ["data", "analytics", "mlops"]
+text = "has shipped data pipelines end to end and built the dashboards a data team actually trusted"
+
+[[referral.pitch]]
+keywords = ["ai", "llm", "agent", "machine learning"]
+text = "has built and run production LLM agents with real eval sets behind them"
+
+[[referral.pitch]]
+keywords = ["default"]
+text = "ships production software end to end and communicates clearly with non-technical stakeholders"
+
+[exclusions]
+# Companies/threads you want to keep for yourself — never referred.
+# Matched as case-insensitive whole-word regex fragments against the thread text.
+# LINKEDIN_AGENT_RESERVED_COMPANIES (comma-separated)
+reserved_for_self = ["Example Reserved Co"]
+# People to never contact or reply to at all, for any reason.
+# LINKEDIN_AGENT_NEVER_CONTACT (comma-separated names)
+never_contact = ["Example Blocked Person"]
+
+[popups]
+# What to click when LinkedIn shows "Share your contact info?" after a reply.
+# "decline" or "share".
+share_contact = "decline"
+
+[governor]
+# SQLite ledger that paces sends and refuses to repeat an action on the same
+# target (thread/post). Enforced on every send-referral and post publish call.
+# Default: ~/.config/linkedin-agent/governor.db
+# LINKEDIN_AGENT_GOVERNOR_DB
+db_path = ""
+

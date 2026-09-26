@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "linkedin-agent"
+version = "0.1.0"
+description = "LinkedIn automation any coding agent can drive, over the user's own logged-in Chrome (via own-chrome/CDP)."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [{ name = "linkedin-agent contributors" }]
+keywords = ["linkedin", "cdp", "chrome", "cli", "agents", "automation"]
+classifiers = [
+  "Environment :: Console",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Utilities",
+]
+dependencies = [
+  "own-chrome @ git+https://github.com/ml-lubich/own-chrome",
+  "typer>=0.12",
+  "rich>=13",
+]
+
+[project.urls]
+Homepage = "https://github.com/ml-lubich/linkedin-agent"
+Repository = "https://github.com/ml-lubich/linkedin-agent"
+Issues = "https://github.com/ml-lubich/linkedin-agent/issues"
+
+[project.scripts]
+linkedin-agent = "linkedin_agent.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-cov>=5", "hypothesis>=6"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/linkedin_agent"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.coverage.run]
+source = ["linkedin_agent"]
