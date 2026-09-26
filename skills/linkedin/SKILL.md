@@ -24,10 +24,12 @@ Install:
 uv tool install git+https://github.com/ml-lubich/linkedin-agent
 ```
 
-Chrome must already be listening on its debugging port (default `9222`):
+Chrome must already be listening on its debugging port (default `9222`).
+Quit Chrome fully first, then (macOS): Chrome 136+ ignores the flag on the
+default profile directory, so launch against a separate one:
 
 ```bash
-google-chrome --remote-debugging-port=9222 --user-data-dir="$HOME/chrome-debug"
+open -a "Google Chrome" --args --remote-debugging-port=9222 --user-data-dir="$HOME/chrome-debug"
 ```
 
 Config lives at `~/.config/linkedin-agent/config.toml` (copy
@@ -55,9 +57,9 @@ li query threads --filter "<name>" --limit 5 --json   # search by name/preview
 li query unread --json --limit 10                     # unread only
 ```
 
-`scan` loads the whole inbox (LinkedIn loads it lazily) and returns only
-threads where the last message isn't yours, nothing is excluded by config,
-and (if referrals are on) the referee hasn't already been mentioned.
+`scan` returns only threads where the last message isn't yours, nothing is
+excluded by config, and (if referrals are on) the referee hasn't already
+been mentioned.
 
 ## Classify a message
 
@@ -65,45 +67,33 @@ and (if referrals are on) the referee hasn't already been mentioned.
 linkedin-agent classify "InMail: Senior AI Engineer role at Acme" --name "Jordan Lee"
 ```
 
-Returns whether it looks like a hiring message, whether it is excluded
-(`exclusions.reserved_for_self` / `never_contact` in config), and whether the
-referee has already been mentioned in that thread.
+Returns whether it looks like a hiring message, whether it's excluded
+(`exclusions.reserved_for_self` / `never_contact`), and whether the referee
+has already been mentioned in that thread.
 
-## Draft or send a message — sending is explicit, always
+## Draft or send a message / post — sending is explicit, always
 
-Drafting never touches the browser. Sending requires `--confirm`, and only
-call it with `--confirm` when the current turn has explicitly named the
-recipient (the open/target thread) and approved the exact text.
-
-```bash
-# draft only, nothing sent
-linkedin-agent message send "Thanks, that works for me." 
-
-# actually click Send (only after explicit user approval this turn)
-linkedin-agent message send "Thanks, that works for me." --confirm
-```
-
-Attach a file (e.g. a resume) with `--attach /path/to/file.pdf` and give the
-filename LinkedIn should show with `--attach-name`.
-
-## Draft or publish a post — publishing is explicit, always
+Drafting never touches the browser. `--confirm` is required to actually
+click Send/Post, and only pass it when the current turn explicitly named the
+recipient/thread and approved the exact text.
 
 ```bash
-linkedin-agent post draft "Shipped a small CDP client this week..."
-# problems: [] means it passed the anti-cringe lint (banned buzzwords, hashtag spam)
+linkedin-agent message send "Thanks, that works for me."             # draft only
+linkedin-agent message send "Thanks, that works for me." --confirm   # click Send
+# --attach /path/to/file.pdf --attach-name resume.pdf   to attach a file
 
-linkedin-agent post publish "Shipped a small CDP client this week..." --confirm
+linkedin-agent post draft "Shipped a small CDP client this week..."  # anti-cringe lint only
+linkedin-agent post publish "Shipped a small CDP client this week..." --confirm --image /path/to/img.png
 ```
 
-`post draft` never touches the browser; it only lints the text against banned
-AI-hype phrases ("excited to announce", "game-changer", "leverage", ...) and a
-2-hashtag cap. `post publish` opens the composer, types the text, optionally
-attaches an image with `--image`, and only clicks Post with `--confirm`.
+`post draft` lints against banned AI-hype phrases ("excited to announce",
+"game-changer", "leverage", ...) and a 2-hashtag cap; it never opens the
+browser.
 
 ## Send a referral (text + resume attachment)
 
-Only if `[referral]` is configured (`referral.enabled = true`, plus name,
-email, LinkedIn URL, and `resume_path`) in `config.toml`.
+Only if `[referral]` is configured (`enabled = true`, plus name, email,
+LinkedIn URL, and `resume_path`) in `config.toml`.
 
 ```bash
 linkedin-agent draft-referral "Jordan Lee" "Exciting AI Engineer role at Acme" --headline "Talent @ Acme"
@@ -111,21 +101,16 @@ linkedin-agent draft-referral "Jordan Lee" "Exciting AI Engineer role at Acme" -
 linkedin-agent send-referral "Jordan Lee" "<thread url>" --text "<thread text>" --confirm
 ```
 
-`send-referral` re-opens the thread by URL (not by clicking the sidebar,
-which can silently leave the wrong thread open), re-checks the referee hasn't
-already been mentioned, drafts a personalized 3-5 sentence message with
-`draft_referral`, attaches `referral.resume_path` under the name
-`referral.attachment_name`, and only sends with `--confirm`. It verifies
-delivery by checking the last message and compose box afterward.
+`send-referral` re-opens the thread by URL (not the sidebar, which can leave
+the wrong thread open), re-checks the referee hasn't already been mentioned,
+attaches `referral.resume_path`, and only sends with `--confirm`.
 
 ## Search people and jobs
 
-Search is a plain `li`/`own-chrome` navigation + read, since it needs no
-LinkedIn-agent-specific logic:
+Plain `li`/`own-chrome` navigation, no LinkedIn-agent-specific logic:
 
 ```bash
 own-chrome goto "https://www.linkedin.com/search/results/people/?keywords=<query>" --filter linkedin
-li query threads --json    # or read the search results tab directly
 own-chrome goto "https://www.linkedin.com/jobs/search/?keywords=<query>" --filter linkedin
 ```
 

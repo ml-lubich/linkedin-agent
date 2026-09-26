@@ -20,15 +20,21 @@ uv tool install git+https://github.com/ml-lubich/linkedin-agent
 npx skills add ml-lubich/linkedin-agent
 ```
 
-Launch Chrome with a debugging port and a non-default profile directory
-(Chrome 136+ ignores the flag on the default profile):
+Fully quit Chrome (Cmd+Q — flags only take effect on a fresh launch), then
+relaunch it with a debugging port and a non-default profile directory. Chrome
+136+ silently ignores `--remote-debugging-port` on the default profile
+directory (a security fix to stop CDP-based session theft), so this only
+works pointed at a separate directory:
 
 ```bash
-google-chrome --remote-debugging-port=9222 --user-data-dir="$HOME/chrome-debug"
+open -a "Google Chrome" --args --remote-debugging-port=9222 --user-data-dir="$HOME/chrome-debug"
 ```
 
-Sign into LinkedIn in that Chrome window yourself, once. Everything after
-that reads/writes through the open tab.
+Sign into LinkedIn in that Chrome window yourself, once. It's a separate
+profile from your daily-driver Chrome, but it persists at `~/chrome-debug`,
+so you only sign in the first time — every later launch with the same
+`--user-data-dir` keeps the session. Everything after that reads/writes
+through the open tab.
 
 ## Configure
 
