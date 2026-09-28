@@ -1,3 +1,13 @@
+# linkedin-agent (archived)
+
+**Moved to [linkedin-mcp](https://github.com/ml-lubich/linkedin-mcp).** Everything here now lives there as one package that is both a CLI (`linkedin ...`) and an MCP server (`linkedin-mcp serve`).
+
+```bash
+uv tool install git+https://github.com/ml-lubich/linkedin-mcp
+```
+
+---
+
 # linkedin-agent
 
 LinkedIn automation any coding agent (Claude Code, Cursor, Codex, Gemini) can
